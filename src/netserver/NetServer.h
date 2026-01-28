@@ -14,4 +14,7 @@ private:
     KVServer* kv_;
 
     void handleClient(int clientFd);
+    void handlePut(std::istringstream& iss, std::string& response);
+    void handleGet(std::istringstream& iss, std::string& response);
+    void handleDelete(std::istringstream& iss, std::string& response);
 };
