@@ -1,21 +1,27 @@
 #include "NetServer.h"
 #include "kvserver/KVServer.h"
+#include "common/Command.h"
 
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <cstring>
 #include <iostream>
+#include <string>
 #include <sstream>
 
 
 NetServer::NetServer(KVServer* KVServer)
-    : kv_(KVServer), listenFd_(-1) {}
+    : kv_(KVServer), listenFd_(-1) {
+        requestMap_["PUT"] = RequestType::PUT;
+        requestMap_["GET"] = RequestType::GET;
+        requestMap_["DEL"] = RequestType::DELETE;
+    }
 
 void NetServer::start(int port) {
     listenFd_ = socket(AF_INET, SOCK_STREAM, 0);
 
-    scokaddr_in addr{};
+    sockaddr_in addr{};
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = INADDR_ANY;
     addr.sin_port = htons(port);
@@ -32,7 +38,7 @@ void NetServer::start(int port) {
     }
 }
 
-void NetServer::handleCLient(int clientFd) {
+void NetServer::handleClient(int clientFd) {
     char buffer[1024];
 
     while (true) {
@@ -47,10 +53,10 @@ void NetServer::handleCLient(int clientFd) {
         iss >> cmd;
 
         std::string response;
-        switch (cmd) {
-            case "PUT": handlePut(iss, response); break;
-            case "GET": handleGet(iss, response); break;
-            case "DEL": handleDelete(iss, response); break;
+        switch (requestMap_[cmd]) {
+            case RequestType::PUT : handlePut(iss, response); break;
+            case RequestType::GET : handleGet(iss, response); break;
+            case RequestType::DELETE : handleDelete(iss, response); break;
             default: response = "ERROR: Unknown command\n"; break;
         }
 

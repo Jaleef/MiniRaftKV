@@ -1,7 +1,7 @@
-#include "KVServer.h"
-#include "RaftNode.h"
-#include "StateMachine.h"
-#include "Command.h"
+#include "kvserver/KVServer.h"
+#include "raftnode/RaftNode.h"
+#include "raftnode/StateMachine.h"
+#include "common/Command.h"
 
 KVServer::KVServer(RaftNode* raftNode, StateMachine* stateMachine)
     : raftNode_(raftNode), stateMachine_(stateMachine) {}
